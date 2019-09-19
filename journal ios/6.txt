@@ -1,0 +1,109 @@
+6.Develop an application to perform CRUD operations on sqlite databse. (create
+employee table with field Eid, Ename, Eage, Eaddress).
+
+viewcontoller.h
+
+#import <UIKit/UIKit.h>
+#import <sqlite3.h>
+@interface ViewController : UIViewController
+@property (weak, nonatomic) IBOutlet UITextField *name;
+@property (weak, nonatomic) IBOutlet UITextField *eage;
+@property (weak, nonatomic) IBOutlet UITextField *eaddress;
+@property (weak, nonatomic) IBOutlet UILabel *status;
+- (IBAction)btnadd:(id)sender;
+@property (strong, nonatomic) NSString *databasePath;
+@property (nonatomic) sqlite3 *DB;
+- (IBAction)btnfind:(id)sender;
+- (IBAction)btnupdate:(id)sender;
+- (IBAction)btndelete:(id)sender;
+@end
+
+viewController.m
+
+#import "ViewController.h"
+@interface ViewController ()
+{    NSMutableArray *getEmployees;}
+@end
+@implementation ViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    NSString *docsdir;
+    NSArray *dirpaths;
+    dirpaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    docsdir = [dirpaths objectAtIndex:0];
+    _databasePath = [[NSString alloc]initWithString:[docsdir stringByAppendingPathComponent:@"Emp.db"]];
+    NSFileManager *filemgr = [NSFileManager defaultManager];
+    if([filemgr fileExistsAtPath:_databasePath] == NO)
+    {   const char *dbpath = [_databasePath UTF8String];
+        if(sqlite3_open(dbpath,&_DB)==SQLITE_OK)
+        {   char *errmsg;
+            const char *sql_stmt = "CREATE TABLE IF NOT EXISTS employee(eid INTEGER PRIMARY KEY AUTOINCREMENT, ename TEXT, eage INTEGER, eadd TEXT)";            
+            if(sqlite3_exec(_DB, sql_stmt,NULL,NULL,&errmsg)!=SQLITE_OK)
+            {                _status.text = @"Failed to create table";            }
+            sqlite3_close(_DB);
+        }else{   _status.text = @"Failed to Open/create Database";        }               
+    }    
+}
+- (IBAction)btnadd:(id)sender {    
+    sqlite3_stmt *statement;
+    const char *dbpath = [_databasePath UTF8String];
+    if(sqlite3_open(dbpath,&_DB)==SQLITE_OK)
+    {   NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO employee (ename,eage,eadd) VALUES(\"%@\",\"%@\",\"%@\")",_name.text,_eage.text,_eaddress.text];
+        const char *insert_stmt = [insertSQL UTF8String];
+        sqlite3_prepare(_DB, insert_stmt, -1, &statement, NULL);
+        if(sqlite3_step(statement)==SQLITE_DONE)
+        {   NSLog(@"%@",insertSQL);_status.text = @"Record Inserted";_name.text = @"";
+            _eage.text = @""; _eaddress.text = @"";
+        }else{  _status.text = @"Failed to Insert";  }
+        sqlite3_finalize(statement);sqlite3_close(_DB);
+    }    
+}
+- (IBAction)btnfind:(id)sender {    
+    const char *dbpath = [_databasePath UTF8String];
+    sqlite3_stmt *statment;
+    if(sqlite3_open(dbpath,&_DB)==SQLITE_OK)
+    {   NSString *querysql = [NSString stringWithFormat:@"SELECT eage,eadd FROM employee WHERE ename=\"%@\"",_name.text];
+        const char *query_stmt = [querysql UTF8String];
+        NSLog(@"%@",querysql);
+        if(sqlite3_prepare(_DB, query_stmt, -1, &statment, NULL) == SQLITE_OK)
+        {   if(sqlite3_step(statment)== SQLITE_ROW)
+            {   NSString *agef = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statment, 0)];
+                _eage.text = agef;
+                NSString *addf = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statment, 1)];
+                _eaddress.text = addf;
+            }else{  _status.text = @"Match Not Found"; _eage.text = @""; _eaddress.text = @"";  }
+            sqlite3_finalize(statment);
+        } sqlite3_close(_DB);
+    }    
+}
+- (IBAction)btnupdate:(id)sender {
+    const char *dbpath = [_databasePath UTF8String];
+    sqlite3_stmt *statment;
+    if(sqlite3_open(dbpath,&_DB)==SQLITE_OK)
+    {   NSString *querysql = [NSString stringWithFormat:@"UPDATE employee set eage=\"%@\",eadd=\"%@\" WHERE ename=\"%@\"",_eage.text,_eaddress.text,_name.text];
+        const char *query_stmt = [querysql UTF8String];
+        NSLog(@"%@",querysql);
+        if(sqlite3_prepare(_DB, query_stmt, -1, &statment, NULL) == SQLITE_OK)
+        {   if(sqlite3_step(statment)== SQLITE_DONE)
+            {   _status.text = @"Updated.."; _name.text = @""; _eage.text = @"";  _eaddress.text = @"";
+            }else{ _status.text = @" Not Updated";              }
+            sqlite3_finalize(statment);
+        } sqlite3_close(_DB);
+    }
+}
+- (IBAction)btndelete:(id)sender {   
+    const char *dbpath = [_databasePath UTF8String];
+    sqlite3_stmt *statment;
+    if(sqlite3_open(dbpath,&_DB)==SQLITE_OK)
+    {   NSString *querysql = [NSString stringWithFormat:@"DELETE FROM employee WHERE ename=\"%@\"",_name.text];
+        const char *query_stmt = [querysql UTF8String];
+        NSLog(@"%@",querysql);
+        if(sqlite3_prepare(_DB, query_stmt, -1, &statment, NULL) == SQLITE_OK)
+        {   if(sqlite3_step(statment)== SQLITE_DONE)
+            {   _status.text = @"Deleted..";_name.text = @"";_eage.text = @"";_eaddress.text = @"";
+            }else{ _status.text = @" Not daleted";       }
+            sqlite3_finalize(statment);
+        }        sqlite3_close(_DB);
+    }
+}
+@end

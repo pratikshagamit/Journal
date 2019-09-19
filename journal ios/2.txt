@@ -1,0 +1,82 @@
+2.Write a program in Objective C to read and print student’s information using two
+  classes and simple inheritance. ( Student :name, age, gender Result: marks, per,
+  Grade).
+
+Student.h
+
+#import <Foundation/Foundation.h>
+@interface Student : NSObject
+{    int rno; NSString  *name;int age; NSString *gender;}
+-(void) setStud:(int) r:(char []) nm:(int) ag:(char []) g;
+-(void) getStud;
+@end
+
+Student.m
+
+#import "Student.h"
+@implementation Student
+-(void) setStud:(int)r :(char []) nm :(int)ag :(char []) g
+{   rno=r;name=[NSString stringWithUTF8String:nm];age=ag;gender=[NSString stringWithUTF8String:g];}
+-(void) getStud{
+    NSLog(@"Roll no:@%d",rno);
+    NSLog(@"Name:%@",name);
+    NSLog(@"age: @%d",age);
+    NSLog(@"Gender:%@",gender);
+}
+@end
+
+Result.h
+
+#import "Student.h"
+@interface Result : Student
+{   int sub1,sub2,sub3,total; float per; char grd;}
+-(void) setMarks:(int) s1:(int) s2:(int) s3;
+-(void) getResult;
+@end
+
+Result.m
+
+#import "Result.h"
+@implementation Result
+-(void) setMarks:(int)s1 :(int)s2 :(int)s3{ sub1=s1;sub2=s2; sub3=s3;}
+-(void) getResult{ total=sub1+sub2+sub3;per=total/3;
+    if(per>=70){  grd='A'; } 
+    else if(per<70 && per>=50){ grd='B';}
+    else if(per<50){ grd='c'; }
+    else{ grd='d';}    
+    NSLog(@"Result..."); NSLog(@"Name:%@",name); NSLog(@"Sub1:%d",sub1);
+    NSLog(@"Sub2:%d",sub2);NSLog(@"Sub3:%d",sub3); NSLog(@"Total marks:%d",total);
+    NSLog(@"Percentage:%f",per);  NSLog(@"Grade:%c",grd);    
+}
+@end
+
+main.m
+
+#import <Foundation/Foundation.h>
+#import "Result.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {    
+        int rn,ag,sub1,sub2,sub3;char nm[50],gn[10];Result *r =[[Result alloc]init];      
+        printf("Enter student detail...");        
+        printf("Enter roll no:");
+        scanf("%d",&rn);
+        printf("Enter Name");
+        scanf("%s",nm);
+        printf("Enter Age:");
+        scanf("%d",&ag);
+        printf("gender:");
+        scanf("%s",gn);
+        [r setStud:rn :nm :ag :gn];
+        printf("Enter Marks...");
+        printf("Sub1:");
+        scanf("%d",&sub1);
+        printf("Sub2:");
+        scanf("%d",&sub2);
+        printf("Sub3:");
+        scanf("%d",&sub3);        
+        [r setMarks:sub1 :sub2 :sub3];
+        [r getStud];
+        [r getResult];        
+    }
+    return 0;
+}

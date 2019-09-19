@@ -1,0 +1,47 @@
+5.Develop an application to insert an item and remove an item dynamically from
+  tableView.
+
+ViewController.h
+
+#import <UIKit/UIKit.h>
+@interface ViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
+@property (strong, nonatomic) IBOutlet UITableView *st1;
+- (IBAction)insert:(id)sender;
+@property (strong, nonatomic) IBOutlet UITextField *t1;
+@end
+
+ViewController.m
+
+#import "ViewController.h"
+@interface ViewController ()
+{    NSMutableArray *city;}
+@end
+@implementation ViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    city = [[NSMutableArray alloc] initWithObjects:@"surat",@"mumbai", nil];
+}
+
+-(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{ return [city count];}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{   static NSString *sid = @"staict id";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sid];   
+    if(cell == nil)
+    {        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:sid];    }
+    cell.textLabel.text = [city objectAtIndex:indexPath.row];
+    return cell;
+}
+- (IBAction)insert:(id)sender {
+    [city addObject:_t1.text];   
+    NSArray *path = [NSArray arrayWithObject:[NSIndexPath indexPathForRow:[city count]-1 inSection:0]];   
+    [_st1 insertRowsAtIndexPaths:path withRowAnimation:UITableViewRowAnimationTop];
+}
+-(void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+    [city removeObjectAtIndex:indexPath.row];   [tableView reloadData];}
+-(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{ 
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];    
+    cell.accessoryType=UITableViewCellAccessoryDetailButton;
+}
+@end

@@ -1,0 +1,61 @@
+3.Write a program in Objective C to demonstrate hierarchical inheritance to get Square
+  and Cube of number. (Number -&gt; Square -&gt; Cube).
+
+getnumber.h
+
+#import <Foundation/Foundation.h>
+@interface getnumber : NSObject
+-(void) display:(int) a;
+@end
+
+getnumber.m
+
+#import "getnumber.h"
+@implementation getnumber
+-(void)display:(int)a
+{    NSLog(@"Number id=%d" ,a);}
+@end
+
+squareofnumber.h
+
+#import "getnumber.h"
+@interface squareofnumber : getnumber
+-(void)squareofNumbaer:(int)a;
+@end
+
+squareofnumber.m
+
+#import "squareofnumber.h"
+@implementation squareofnumber
+-(void)squareofNumbaer:(int)a
+{    NSLog(@"Square of Number is=%d",a*a);}
+@end
+
+cubeofnumber.h
+
+#import "squareofnumber.h"
+@interface cubeof_number : squareofnumber
+-(void)cubeofNumber:(int)a;
+@end
+
+cubeofnumber.m
+
+#import "cubeof number.h"
+@implementation cubeof_number
+-(void)cubeofNumber:(int)a
+{    NSLog(@"Cube of Number is=%d",a*a*a);}
+@end
+
+main.m
+
+#import <Foundation/Foundation.h>
+#import "cubeof number.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        cubeof_number *obj = [[cubeof_number alloc]init];
+        [obj display:5];
+        [obj squareofNumbaer:5];
+        [obj cubeofNumber:5];
+    }
+    return 0;
+}
